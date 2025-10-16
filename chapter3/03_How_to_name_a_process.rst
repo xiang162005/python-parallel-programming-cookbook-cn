@@ -22,10 +22,19 @@
 
         if __name__ == '__main__':
             process_with_name = multiprocessing.Process(name='foo_process', target=foo)
-            process_with_name.daemon = True  # 注意原代码有这一行，但是译者发现删掉这一行才能得到正确输出
+            process_with_name.daemon = True
             process_with_default_name = multiprocessing.Process(target=foo)
             process_with_name.start()
             process_with_default_name.start()
+
+            """
+            我们需要在最后一行加上这个join，让主进程等待foo_process进程结束才停止。
+            不然foo_process由于是守护进程会随着主进程的结束而立即结束。
+            从而来不及执行打印"Starting foo_process"和"Exiting foo_process"。
+            
+            当然也可以去掉'process_with_name.daemon = True'这行代码，这也可以实现同样的效果。至于为什么，留待读者自行思考。
+            """
+            process_with_name.join()
 
 运行上面的代码，打开终端输入:  ::
 
